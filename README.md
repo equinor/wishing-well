@@ -8,3 +8,5 @@ To build do:
 And to run:
 
 ```docker run -p 5000:5000 hello```
+
+You should then be able to access localhost:5000 and see a message

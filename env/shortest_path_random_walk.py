@@ -91,8 +91,3 @@ class shortest_path:
         plt.plot(x, y, label="optimal path")
         plt.legend()
         
-
-model = shortest_path(7, 30, [1, 0], [5, 6])
-    
-model.grid_gen()
-model.max_pi(1000)  

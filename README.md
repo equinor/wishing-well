@@ -10,7 +10,7 @@ And to run:
 ```docker run -it --rm --name wwrunning wishing-well-app```
 
 
-##To run with GUI in windows
+## To run with GUI in windows
 
 Remember to use PowerShell, you might have issues using cmd.
 

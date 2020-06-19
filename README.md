@@ -34,6 +34,6 @@ Choose the address that you get your internet from, and put this into the DISPLA
 
 Then you just have to run
 
-```docker run -it --rm --name wwrunning DISPLAY=$DISPLAY wishing-well-app```
+```docker run -it --rm --name wwrunning -e DISPLAY=$DISPLAY wishing-well-app```
 
 It should now display the GUI.

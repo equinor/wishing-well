@@ -20,7 +20,7 @@ Build like you normally would:
 
 Then you have to install [VcXsrv](https://sourceforge.net/projects/vcxsrv/)
 
-When it is installed, run XLaunch and go through the wizard. Check off the Disable access control option.
+When it is installed, run XLaunch and go through the wizard. Enable the Disable access control option.
 
 When you are finished, VcXsrv should be running as an icon in the lower right corner.
 

@@ -7,4 +7,4 @@
 
     COPY . .
 
-    CMD [ "python", "./main.py" ]
+    CMD [ "python","-u","./main.py" ]	#The "-u" is there to run it "unbuffered". That means that the printed output from python wil be shown in our host terminal, not the invisible container terminal

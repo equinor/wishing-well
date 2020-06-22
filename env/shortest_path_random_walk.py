@@ -5,9 +5,13 @@ Created on Thu Jun 18 08:48:53 2020
 @author: Jakob Torben
 """
 
+import matplotlib as mpl            #Import entire matplotlib and use WebAgg for showing in browser
+#from matplotlib.figure import Figure
+
+import matplotlib.pyplot as plt     #Still use plt for pyplot for familiarity
 import numpy as np
-import matplotlib.pyplot as plt
 import random
+#plt.ion()
 
 
 class shortest_path:
@@ -21,6 +25,9 @@ class shortest_path:
         self.step = step    # distance between points
         self.start = np.array(start)*step    # starting point
         self.stop = np.array(stop)*step    # ending point
+        
+        self.fig = plt.figure()
+        self.subplot = self.fig.add_subplot(111)
 
 
     def grid_gen(self):
@@ -28,13 +35,15 @@ class shortest_path:
         Generates a gridpoints and plots the grid.
         Only for visualisation, not used for shortest path.
         """
-        
+
+
         x = np.arange(0, self.L*self.step, self.step)
         y = np.arange(0, self.L*self.step, self.step)
         X, Y = np.meshgrid(x, y)
         
-        plt.plot(X, Y, 'ob')
-        plt.gca().invert_yaxis()
+        self.subplot.plot(X, Y, 'ob')
+        self.fig.gca().invert_yaxis()
+        #self.fig.show()
         plt.show()
         
         
@@ -104,14 +113,19 @@ class shortest_path:
         # print("Shortest path: ", shortest_path)
         print("Path length: ", -max(valuefunc))
         
-        plt.plot(self.start[0], self.start[1], "or", label="start", markersize=10)
-        plt.plot(self.stop[0], self.stop[1], "og", label="stop", markersize=10)
+        self.subplot.plot(self.start[0], self.start[1], "or", label="start", markersize=10)
+        self.subplot.plot(self.stop[0], self.stop[1], "og", label="stop", markersize=10)
         x, y = shortest_path.T
-        plt.plot(x, y, label="optimal path")
-        plt.legend()
+        self.subplot.plot(x, y, label="optimal path")
+        self.subplot.legend()
+
+    def get_figure(self):
+        return self.fig
         
 
-model = shortest_path(7, 30, [1, 0], [5, 6])
+#model = shortest_path(7, 30, [1, 0], [5, 6])
     
-model.grid_gen()
-model.optimal_path(100)  
+#model.grid_gen()
+#model.optimal_path(100)
+#plt.ioff()
+#plt.show()

@@ -1,39 +1,26 @@
 # wishing-well
 Team repo for Wishing Well team - Virtual summer internship 2020
 
-To build do:
+
+## Showing plot in browser
+
+First, navigate to the wishing-well repository on your computer.
+Then build the container using:
 
 ```docker build -t wishing-well-app .```
 
-And to run:
+Then run it with:
 
-```docker run -it --rm --name wwrunning wishing-well-app```
+```docker run -p 8080:8080 --name wwrunning wishing-well-app```
 
 
-## To run with GUI in windows
+It should now display the plot at http://localhost:8080/
 
-Remember to use PowerShell, you might have issues using cmd.
+When you have changed your code, you need to run
 
-Build like you normally would:
+```docker rm -f wwrunning```
+Then build and run again.
 
-```docker build -t wishing-well-app .```
+Or, if you want to do it like the pros, just copy-paste this into your terminal (Powershell) It will remove the old container, build a new one, and run it:
+```docker rm -f wwrunning; docker build -t wishing-well-app .; docker run -p 8080:8080 --name wwrunning wishing-well-app ```
 
-Then you have to install [VcXsrv](https://sourceforge.net/projects/vcxsrv/)
-
-When it is installed, run XLaunch and go through the wizard. Enable the Disable access control option.
-
-When you are finished, VcXsrv should be running as an icon in the lower right corner.
-
-Then you need to find your IPv4 address by running:
-
-```ipconfig```
-
-Choose the address that you get your internet from, and put this into the DISPLAY variable:
-
-```set-variable -name DISPLAY -value YOUR.IP.RIGHT.HERE:0.0```
-
-Then you just have to run
-
-```docker run -it --rm --name wwrunning -e DISPLAY=$DISPLAY wishing-well-app```
-
-It should now display the GUI.

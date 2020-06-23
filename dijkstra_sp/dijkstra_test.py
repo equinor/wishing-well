@@ -216,6 +216,7 @@ n_rows = 4
 n_columns = 4
 n_nodes = n_rows*n_columns
 idx_start_node = 0
+idx_goal_node = 15
 weights = np.ones(n_nodes)
 weights[10] = 2
 
@@ -252,4 +253,19 @@ for i in range(n_nodes): #Initialize all edges to node neighbours given weights
         g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
 
 source = node_list[idx_start_node]
-print([(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)])    
+print([(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node])
+
+def coordinates(idx_str,n_columns, n_rows):
+    idx_dec = (int(idx_str, 2))
+    y = idx_dec//n_columns
+    x = idx_dec - y*n_columns
+    return x,y
+
+
+traj_str = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node][1]
+traj_coord = []
+for i in range(len(traj_str)):
+    traj_coord.append(coordinates(traj_str[i], n_columns, n_rows))
+    
+
+print("shortest path trajectory:", traj_coord)

@@ -255,12 +255,12 @@ for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given 
         g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
 
     #Promote vertical start of trajectory
-    vert_start_prom = 10
+    vert_start_prom = 2
     if i == idx_start_node and (i)//n_columns != (n_rows -1):   #...and not in last row
         g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2-vert_start_prom)
     
     #Promote horizontal end of trajectory
-    horiz_end_prom = 10
+    horiz_end_prom = 2
     if i == idx_goal_node: 
         if (i + 1)%n_columns != 0:           #...and not in last column
             g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2-horiz_end_prom)
@@ -284,14 +284,16 @@ def coordinates(idx_str,n_columns, n_rows):
 
 source = node_list[idx_start_node]
 paths = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)] #All paths from start node
+
 for i in range(n_nodes): #Find the path from start node to goal node 
     if paths[i][1][-1] == "{0:b}".format(idx_goal_node):
         traj_str = paths[i][1]
-
+        traj_cost = paths[i][0]
 traj_coord = []
 for i in range(len(traj_str)):
     traj_coord.append(coordinates(traj_str[i], n_columns, n_rows))
-print("shortest path trajectory:", traj_coord)
+print("Shortest path trajectory:", traj_coord)
+print("Cost of trajectory: ", traj_cost)
 
 
 #Illustration 

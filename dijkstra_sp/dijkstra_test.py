@@ -207,18 +207,25 @@ class Graph:
 
         return min_dist_list 
 
-#Custom inport
+#Custom import
 
 import numpy as np
 
 #Variables
-n_rows = 4
-n_columns = 4
+n_rows = 10
+n_columns = 10
 n_nodes = n_rows*n_columns
-idx_start_node = 0
-idx_goal_node = 15
+idx_start_node = 1
+idx_goal_node = 99
+
 weights = np.ones(n_nodes)
-weights[10] = 2
+weights[20:40] = 2
+weights[40:50] = 3
+weights[50:70] = 4
+weights[73:80] = 5
+weights[84]    = 5
+weights[96]    = 5
+
 
 #Initialize nodes
 node_list = []
@@ -231,7 +238,7 @@ for i in range(n_nodes):
 
 print(len(node_list))
 g = Graph(node_list)
-for i in range(n_nodes): #Initialize all edges to node neighbours given weights
+for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given weights
     if (i + 1)%n_columns != 0:              #not in last column
         g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2)
         if (i)//n_columns != (n_rows -1):   #...and not in last row 
@@ -261,11 +268,42 @@ def coordinates(idx_str,n_columns, n_rows):
     x = idx_dec - y*n_columns
     return x,y
 
+#Calculate shortest path
 
 traj_str = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node][1]
 traj_coord = []
 for i in range(len(traj_str)):
     traj_coord.append(coordinates(traj_str[i], n_columns, n_rows))
-    
-
 print("shortest path trajectory:", traj_coord)
+
+
+#Illustration 
+
+import matplotlib
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+colors = 'lime red blue magenta yellow'.split()
+cmap = matplotlib.colors.ListedColormap(colors, name='colors', N=None)
+
+def illustrate(weights,traj_list):
+    w_m = np.reshape(weights,(n_rows,n_columns))
+    ax = plt.subplot(111)
+    im = plt.imshow(w_m, cmap=cmap)
+    for i in range(len(traj_list)):
+        print(i)
+        point = traj_list[i]
+        plt.scatter(point[0],point[1])
+        if i > 0:
+            point_prev = traj_list[i-1]
+            print("prev: ", point_prev, "this : ", point)
+            plt.plot([point_prev[0],point[0]], [point_prev[1],point[1]])
+
+
+    divider = make_axes_locatable(ax)       
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(im, cax=cax, label = "Weights")  
+    plt.show()
+    return
+
+illustrate(weights,traj_coord)

@@ -213,8 +213,6 @@ import numpy as np
 n_rows = 10
 n_columns = 10
 n_nodes = n_rows*n_columns
-idx_start_node = 1
-idx_goal_node = 99
 
 weights = np.ones(n_nodes)
 weights[20:40] = 2
@@ -230,8 +228,7 @@ node_list = []
 for i in range(n_nodes):
     node_i = Node("{0:b}".format(i)) #creates nodes with boolean string as varable name (etc. 0 ->'0', 4 -> '100')
     node_list.append(node_i)
-    
-    
+     
 g = Graph(node_list)
 for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given weights
     if (i + 1)%n_columns != 0:              #not in last column
@@ -254,8 +251,8 @@ for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given 
     if (i)//n_columns != (n_rows -1):       #not in last row
         g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
 
-source = node_list[idx_start_node]
-print([(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node])
+
+
 
 def coordinates(idx_str,n_columns, n_rows):
     idx_dec = (int(idx_str, 2))
@@ -264,8 +261,16 @@ def coordinates(idx_str,n_columns, n_rows):
     return x,y
 
 #Calculate shortest path
+idx_start_node = 2
+idx_goal_node = 99
 
-traj_str = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node][1]
+source = node_list[idx_start_node]
+paths = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)]
+for i in range(n_nodes):
+    if paths[i][1][-1] == "{0:b}".format(idx_goal_node):
+        traj_str = paths[i][1]
+# print([(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)])
+#traj_str = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node][1]
 traj_coord = []
 for i in range(len(traj_str)):
     traj_coord.append(coordinates(traj_str[i], n_columns, n_rows))
@@ -278,7 +283,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-colors = 'lime red blue magenta yellow'.split()
+colors = 'lime red cyan magenta yellow blue'.split()
 cmap = matplotlib.colors.ListedColormap(colors, name='colors', N=None)
 
 def illustrate(weights,traj_list):

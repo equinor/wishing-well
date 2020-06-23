@@ -210,7 +210,7 @@ class Graph:
 import numpy as np
 
 #Variables
-n_rows = 10
+n_rows = 13
 n_columns = 10
 n_nodes = n_rows*n_columns
 
@@ -221,7 +221,7 @@ weights[50:70] = 4
 weights[73:80] = 5
 weights[84]    = 5
 weights[96]    = 5
-
+weights[100:130] = 6
 #Initialize nodes
 node_list = []
 
@@ -261,16 +261,15 @@ def coordinates(idx_str,n_columns, n_rows):
     return x,y
 
 #Calculate shortest path
-idx_start_node = 2
+idx_start_node = 1
 idx_goal_node = 99
 
 source = node_list[idx_start_node]
-paths = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)]
-for i in range(n_nodes):
+paths = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)] #All paths from start node
+for i in range(n_nodes): #Find the path from start node to goal node 
     if paths[i][1][-1] == "{0:b}".format(idx_goal_node):
         traj_str = paths[i][1]
-# print([(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)])
-#traj_str = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)][idx_goal_node][1]
+
 traj_coord = []
 for i in range(len(traj_str)):
     traj_coord.append(coordinates(traj_str[i], n_columns, n_rows))

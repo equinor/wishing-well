@@ -225,6 +225,9 @@ weights[100:130] = 6
 #Initialize nodes
 node_list = []
 
+idx_start_node = 1
+idx_goal_node = 99
+
 for i in range(n_nodes):
     node_i = Node("{0:b}".format(i)) #creates nodes with boolean string as varable name (etc. 0 ->'0', 4 -> '100')
     node_list.append(node_i)
@@ -251,6 +254,22 @@ for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given 
     if (i)//n_columns != (n_rows -1):       #not in last row
         g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
 
+    #Promote vertical start of trajectory
+    vert_start_prom = 10
+    if i == idx_start_node and (i)//n_columns != (n_rows -1):   #...and not in last row
+        g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2-vert_start_prom)
+    
+    #Promote horizontal end of trajectory
+    horiz_end_prom = 10
+    if i == idx_goal_node: 
+        if (i + 1)%n_columns != 0:           #...and not in last column
+            g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2-horiz_end_prom)
+
+        if (i + 1)%n_columns != 1:           #...and not in first column
+            g.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2-horiz_end_prom)
+
+     
+        
 
 
 
@@ -261,8 +280,7 @@ def coordinates(idx_str,n_columns, n_rows):
     return x,y
 
 #Calculate shortest path
-idx_start_node = 1
-idx_goal_node = 99
+
 
 source = node_list[idx_start_node]
 paths = [(weight, [n.data for n in node]) for (weight, node) in g.dijkstra(source)] #All paths from start node

@@ -132,8 +132,6 @@ class MinHeap(BinaryTree):
 
 class Graph: 
 
-
-
     def __init__(self, nodes):
         self.adj_list = [ [node, []] for node in nodes ]
         for i in range(len(nodes)):
@@ -226,7 +224,6 @@ weights[73:80] = 5
 weights[84]    = 5
 weights[96]    = 5
 
-
 #Initialize nodes
 node_list = []
 
@@ -235,8 +232,6 @@ for i in range(n_nodes):
     node_list.append(node_i)
     
     
-
-print(len(node_list))
 g = Graph(node_list)
 for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given weights
     if (i + 1)%n_columns != 0:              #not in last column
@@ -291,12 +286,10 @@ def illustrate(weights,traj_list):
     ax = plt.subplot(111)
     im = plt.imshow(w_m, cmap=cmap)
     for i in range(len(traj_list)):
-        print(i)
         point = traj_list[i]
         plt.scatter(point[0],point[1])
         if i > 0:
             point_prev = traj_list[i-1]
-            print("prev: ", point_prev, "this : ", point)
             plt.plot([point_prev[0],point[0]], [point_prev[1],point[1]])
 
 

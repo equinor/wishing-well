@@ -5,15 +5,14 @@ from gym.utils import seeding
 import numpy as np
 import matplotlib.pyplot as plt
 
-#import webbrowser
 
-
-class FooEnv(gym.Env):
+class WellPlot3Env(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self):
+        super(WellPlot3Env, self).__init__()
         self.action_space = spaces.Discrete(3)
-        #self.observation_space = spaces.Box()
+        self.observation_space = spaces.Discrete(1)             #I think the observation space is just one (current point/state of drill)
 
         self.fig = plt.figure()
         self.subplot = self.fig.add_subplot(111)
@@ -85,15 +84,15 @@ class FooEnv(gym.Env):
 
     def step(self, action):
         action = self.scale_point(self.actions_dict[action])
-
         self.current_state = (self.current_state[0]+action[0], self.current_state[1]+action[1])
-
         done = self.current_state == self.end_state
-
         reward = self.get_reward(self.current_state)
-            
         return self.current_state, reward, done, {}
 
+    #Returns the next step without changing current_state
+    def check_step(self,action):
+        action = self.scale_point(self.actions_dict[action])
+        return (self.current_state[0]+action[0], self.current_state[1]+action[1])
 
 
     def reset(self):
@@ -104,20 +103,22 @@ class FooEnv(gym.Env):
     
 
     #def render(self, mode='human'):
-        #Not relevant for this problem scince 
+        #Not relevant for this problem scince we cant iteratively render the plot
     
 
     def plot_line(self,point1,point2):
         plt.plot((point1[0], point2[0]), (point1[1], point2[1]))
 
     def plot_path(self,path):
+        if path is None:
+            raise TypeError("Path was of type None")
+
         for i in range(1,len(path)):
             self.plot_line(path[i-1],path[i])
 
 
     def close(self):
-        plt.show()
-        #webbrowser.open('http://localhost:8080')  # Go to example.com
+        return self.fig
 
 
 #import gym

@@ -237,54 +237,71 @@ for i in range(n_nodes): #Initialize all edges to node neighbours given weights
     #==First 8 edges== 
     #Right(3)
     if (i + 1)%n_columns != 0:              #not in last column
-        g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2)
+        if (i+1,1*(weights[i]+ weights[i+1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist
+            g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2)
         if (i)//n_columns != (n_rows -1):   #...and not in last row 
-            g.connect(node_list[i],node_list[i+n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2)
+            if (i+n_columns+1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i+n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2)
         if (i)//n_columns != 0:             #...and not in first row
-            g.connect(node_list[i],node_list[i-n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2)
+            if (i+n_columns+1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i-n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2)
     #Left(3)
-    if (i + 1)%n_columns != 1:              #not in first column
-        g.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2)
-        if (i)//n_columns != (n_rows -1):   #...and not in last row 
-            g.connect(node_list[i],node_list[i+n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2)
+    if (i + 1)%n_columns != 1: #not in first column
+        if (i-1,1*(weights[i]+ weights[i-1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist      
+                g.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2)
+        if (i)//n_columns != (n_rows -1):   #...and not in last row
+             if (i+n_columns-1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist 
+                g.connect(node_list[i],node_list[i+n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2)
         if (i)//n_columns != 0:             #...and not in first row
-            g.connect(node_list[i],node_list[i-n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2)
+            if (i-n_columns-1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist 
+                g.connect(node_list[i],node_list[i-n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2)
     
     #Up(1)
-    if (i)//n_columns != 0:                 #not in first row
-        g.connect(node_list[i],node_list[i-n_columns],1*(weights[i]+ weights[i-n_columns])/2)
+    if (i)//n_columns != 0: #not in first row
+        if (i-n_columns,1*(weights[i]+ weights[i-n_columns])/2) not in g.connections(node_list[i]): #This edge doesn't already exist                       
+            g.connect(node_list[i],node_list[i-n_columns],1*(weights[i]+ weights[i-n_columns])/2)
     #Down(1)
     if (i)//n_columns != (n_rows -1):       #not in last row
-        g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
+        if (i+n_columns,1*(weights[i]+ weights[i+n_columns])/2) not in g.connections(node_list[i]):    #This edge doesn't already exist
+            g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
     
     #==Extend to 16 edges==
     #Left(2)
     if (i)%n_columns > 1:               #not in two first columns
-        if (i)//n_columns != (n_rows -1):   #...and not in last row 
-            g.connect(node_list[i],node_list[i+n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4)
+        if (i)//n_columns != (n_rows -1):   #...and not in last row
+            if (i+n_columns-2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4) not in g.connections(node_list[i]): #This edge doesn't already exist 
+                g.connect(node_list[i],node_list[i+n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4)
         if (i)//n_columns != 0:             #...and not in first row
-            g.connect(node_list[i],node_list[i-n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4)
+            if (i-n_columns-2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i-n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4)
     #Right(2)   
     if (i)%n_columns < (n_columns - 2): #not in two last columns
-        if (i)//n_columns != (n_rows -1):   #...and not in last row 
-            g.connect(node_list[i],node_list[i+n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4)
+        if (i)//n_columns != (n_rows -1):   #...and not in last row
+            if (i+n_columns+2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i+n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4)
         if (i)//n_columns != 0:             #...and not in first row
-            g.connect(node_list[i],node_list[i-n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4)
+            if (i-n_columns+2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i-n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4)
     #Up(2)
     if (i)//n_columns > 1:              #not in first two rows
         if (i + 1)%n_columns != 0:           #...and not in last column
-            g.connect(node_list[i],node_list[i-2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4)
+            if (i-2*n_columns+1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i-2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4)
 
         if (i + 1)%n_columns != 1:           #...and not in first column
-            g.connect(node_list[i],node_list[i-2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4)
+            if (i-2*n_columns-1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i-2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4)
 
     #Down(2)
     if (i)//n_columns < (n_rows -2):    #not in last two rows
         if (i + 1)%n_columns != 0:           #...and not in last column
-            g.connect(node_list[i],node_list[i+2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4)
+            if (i+2*n_columns+1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i+2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4)
 
         if (i + 1)%n_columns != 1:           #...and not in first column
-            g.connect(node_list[i],node_list[i+2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4)
+            if (i+2*n_columns-1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
+                g.connect(node_list[i],node_list[i+2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4)
+
 
     #Promote vertical start of trajectory
     vert_start_prom = 2

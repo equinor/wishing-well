@@ -269,10 +269,6 @@ for i in range(n_nodes): #Initialize all edges to node neighbours (max 8) given 
             g.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2-horiz_end_prom)
 
      
-        
-
-
-
 def coordinates(idx_str,n_columns, n_rows):
     idx_dec = (int(idx_str, 2))
     y = idx_dec//n_columns

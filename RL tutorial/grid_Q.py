@@ -11,7 +11,8 @@ DETERMINISTIC = False #Change this to include chooseActionProb
 class State:
     def __init__(self, state=START):
         self.board = np.zeros([BOARD_ROWS, BOARD_COLS])
-        #self.board[1, 1] = -1
+        self.board[1, 1] = -1
+        self.obstruction = (1,1)
         self.state = state
         self.isEnd = False
         self.determine = DETERMINISTIC
@@ -66,8 +67,8 @@ class State:
         # if next state is legal
         if (nxtState[0] >= 0) and (nxtState[0] <=  BOARD_ROWS-1):
             if (nxtState[1] >= 0) and (nxtState[1] <= BOARD_COLS-1):
-                #if nxtState != (1, 1):
-                return nxtState
+                if nxtState != self.obstruction:
+                    return nxtState
         return self.state
 
     def showBoard(self):

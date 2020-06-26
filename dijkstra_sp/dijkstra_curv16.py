@@ -370,7 +370,7 @@ def init_pair_nodes(graph, node_list, n_nodes, edges):
     return g_pairs, node_pair_list, node_pair_dir
 
 
-def init_pair_edges(g_pairs, graph, node_pair_list, node_pair_dir, edges, idx_start_node, idx_goal_node, curv_pen, n_col, n_rows):
+def init_pair_edges(g_pairs, graph, node_pair_list, node_pair_dir, edges, idx_start_node, idx_goal_node, curv_pen, max_angle, n_col, n_rows):
     for i in range(len(edges)):    #Initialize all edges to node-pair neighbours given previous individual weights and angle between node-pair-lines
         node = edges[i][1]   #Connecting node                      
         if idx_start_node == edges[i][0]:
@@ -381,7 +381,11 @@ def init_pair_edges(g_pairs, graph, node_pair_list, node_pair_dir, edges, idx_st
         for connection in graph.connections(node):
             if connection[0] in edges[i]:
                 continue
-            edge_weight = node_pair_dir[tuple_string(edges[i])][1] + node_pair_dir[tuple_string((node,connection[0]))][1] + curv_pen*nodes_to_angle(edges[i], (node,connection[0]), n_col,n_rows)**2
+            angle = nodes_to_angle(edges[i], (node,connection[0]), n_col, n_rows)
+            if angle > max_angle:
+                continue
+                
+            edge_weight = node_pair_dir[tuple_string(edges[i])][1] + node_pair_dir[tuple_string((node,connection[0]))][1] + curv_pen*angle**2
             if (node_pair_dir[tuple_string((node,connection[0]))][0], edge_weight) not in g_pairs.connections(node_pair_list[i]):         #This edge doesn't already exist
                 g_pairs.connect_dir(node_pair_list[i], node_pair_list[node_pair_dir[tuple_string((node,connection[0]))][0]], edge_weight)
 
@@ -405,31 +409,31 @@ def illustrate(weights,traj_str,n_columns,n_rows):
     w_m = np.reshape(weights,(n_rows,n_columns))
     ax = plt.subplot(111)
     im = plt.imshow(w_m, cmap=cmap)
+
     for i in range(1,len(traj_str)-1):
         line = traj_str[i].split('-')
         p1 = str_to_coord(line[0],n_columns,n_rows)
         p2 = str_to_coord(line[1],n_columns,n_rows)
         plt.plot([p1[0], p2[0]], [p1[1],p2[1]])
-
     divider = make_axes_locatable(ax)       
     cax = divider.append_axes("right", size="5%", pad=0.05)
     plt.colorbar(im, cax=cax, label = "Weights")  
     plt.show()
     return
 
-def run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_prom, h_prom, curv_pen , bool_16):
+def run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_prom, h_prom, curv_pen , max_angle, bool_16):
     start = timeit.default_timer()
 
     n_nodes = n_rows*n_col
     graph, nodes = init_nodes(n_nodes)
     graph, edges = init_edges(graph, nodes, weights, n_col, n_rows, v_prom, h_prom, bool_16,idx_start,idx_target)
     graph_pairs, node_pair_list, node_pair_dir = init_pair_nodes(graph, nodes, n_nodes, edges)
-    graph_pairs = init_pair_edges(graph_pairs, graph, node_pair_list, node_pair_dir, edges ,idx_start,idx_target,curv_pen, n_col, n_rows)
+    graph_pairs = init_pair_edges(graph_pairs, graph, node_pair_list, node_pair_dir, edges , idx_start, idx_target, curv_pen, max_angle ,n_col, n_rows)
     traj, cost = dijkstraSPA(graph_pairs, node_pair_list)
 
     stop = timeit.default_timer()
     print("Time: ", stop-start) 
-
+    print("Trajectory found: ", traj)
     illustrate(weights,traj,n_col,n_rows)
     return traj, cost
 
@@ -440,6 +444,7 @@ n_rows = 13
 n_col = 10
 idx_start = 1
 idx_target = 99
+
 
 weights = np.ones(n_rows*n_col)
 weights[20:40] = 2
@@ -453,6 +458,7 @@ weights[100:130] = 6
 v_start_prom = 2
 h_end_prom = 2
 curv_pen = 3
+max_angle = 50*np.pi/180
 bool_16 = True # Connectivity of 16 (connectivity of 8 if false)
 
-traj, cost = run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_start_prom, h_end_prom, curv_pen , bool_16)
+traj, cost = run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_start_prom, h_end_prom, curv_pen, max_angle, bool_16)

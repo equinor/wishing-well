@@ -205,127 +205,128 @@ class Graph:
 
         return min_dist_list 
 
-
-
-#Custom import
-
+#Import
 import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import timeit
 
-#Variables
-n_rows = 13
-n_columns = 10
-n_nodes = n_rows*n_columns
+def init_nodes(n_nodes):
+    node_list = []
+    for i in range(n_nodes):        
+        node_i = Node("{0:b}".format(i)) #creates nodes with boolean string as varable name (etc. 0 ->'0', 4 -> '100')
+        node_list.append(node_i)  
+    graph = Graph(node_list)
+    return graph, node_list
 
-weights = np.ones(n_nodes)
-weights[20:40] = 2
-weights[40:50] = 3
-weights[50:70] = 4
-weights[73:80] = 5
-weights[84]    = 5
-weights[96]    = 5
-weights[100:130] = 6
 
-vert_start_prom = 2
-horiz_end_prom = 2
-curvature_penalty = 3
-#Initialize nodes
-node_list = []
+def init_edges(graph, node_list, weights, n_columns, n_rows, v_prom, h_prom, bool_16, idx_start_node, idx_goal_node):
+    edges = []
+    for i in range(len(node_list)): #Initialize all edges to node neighbours given weights
+        #==First 8 edges== 
+        #Right(3)
+        if (i + 1)%n_columns != 0:              #not in last column
+            if (i+1,1*(weights[i]+ weights[i+1])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist
+                graph.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2)
+                edges.append((i,i+1)), edges.append((i+1,i))
+            if (i)//n_columns != (n_rows -1):   #...and not in last row 
+                if (i+n_columns+1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist
+                    graph.connect(node_list[i],node_list[i+n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2)
+                    edges.append((i,i+n_columns+1)), edges.append((i+n_columns+1,i))
+            if (i)//n_columns != 0:             #...and not in first row
+                if (i+n_columns+1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist
+                    graph.connect(node_list[i],node_list[i-n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2)
+                    edges.append((i,i-n_columns+1)), edges.append((i-n_columns+1,i))
+        #Left(3)
+        if (i + 1)%n_columns != 1: #not in first column
+            if (i-1,1*(weights[i]+ weights[i-1])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist      
+                    graph.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2)
+                    edges.append((i,i-1)), edges.append((i-1,i))
+            if (i)//n_columns != (n_rows -1):   #...and not in last row
+                if (i+n_columns-1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist 
+                    graph.connect(node_list[i],node_list[i+n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2)
+                    edges.append((i,i+n_columns-1)), edges.append((i+n_columns-1,i))
+            if (i)//n_columns != 0:             #...and not in first row
+                if (i-n_columns-1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist 
+                    graph.connect(node_list[i],node_list[i-n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2)
+                    edges.append((i,i-n_columns-1)), edges.append((i-n_columns-1,i))
+        
+        #Up(1)
+        if (i)//n_columns != 0: #not in first row
+            if (i-n_columns,1*(weights[i]+ weights[i-n_columns])/2) not in graph.connections(node_list[i]): #This edge doesn't already exist                       
+                graph.connect(node_list[i],node_list[i-n_columns],1*(weights[i]+ weights[i-n_columns])/2)
+                edges.append((i,i-n_columns)), edges.append((i-n_columns,i))
+        #Down(1)
+        if (i)//n_columns != (n_rows -1):       #not in last row
+            if (i+n_columns,1*(weights[i]+ weights[i+n_columns])/2) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                graph.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
+                edges.append((i,i+n_columns)), edges.append((i+n_columns,i))
+        
+        if bool_16 == True: #Extend to 16 edges
+            #Left(2)
+            if (i)%n_columns > 1:               #not in two first columns
+                if (i)//n_columns != (n_rows -1):   #...and not in last row
+                    if (i+n_columns-2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4) not in graph.connections(node_list[i]): #This edge doesn't already exist 
+                        graph.connect(node_list[i],node_list[i+n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4)
+                        edges.append((i,i+n_columns-2)), edges.append((i+n_columns-2,i))
+                if (i)//n_columns != 0:             #...and not in first row
+                    if (i-n_columns-2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i-n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4)
+                        edges.append((i,i-n_columns-2)), edges.append((i-n_columns-2,i))
+            #Right(2)   
+            if (i)%n_columns < (n_columns - 2): #not in two last columns
+                if (i)//n_columns != (n_rows -1):   #...and not in last row
+                    if (i+n_columns+2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i+n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4)
+                        edges.append((i,i+n_columns+2)), edges.append((i+n_columns+2,i))
+                if (i)//n_columns != 0:             #...and not in first row
+                    if (i-n_columns+2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i-n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4)
+                        edges.append((i,i-n_columns+2)), edges.append((i-n_columns+2,i))
+            #Up(2)
+            if (i)//n_columns > 1:              #not in first two rows
+                if (i + 1)%n_columns != 0:           #...and not in last column
+                    if (i-2*n_columns+1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i-2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4)
+                        edges.append((i,2*n_columns+1)), edges.append((2*n_columns+1,i))
+                if (i + 1)%n_columns != 1:           #...and not in first column
+                    if (i-2*n_columns-1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i-2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4)
+                        edges.append((i,i-2*n_columns-1)), edges.append((i-2*n_columns-1,i))
+            #Down(2)
+            if (i)//n_columns < (n_rows -2):    #not in last two rows
+                if (i + 1)%n_columns != 0:           #...and not in last column
+                    if (i+2*n_columns+1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i+2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4)
+                        edges.append((i,i+2*n_columns+1)), edges.append((i+2*n_columns+1,i))
+                if (i + 1)%n_columns != 1:           #...and not in first column
+                    if (i+2*n_columns-1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4) not in graph.connections(node_list[i]):    #This edge doesn't already exist
+                        graph.connect(node_list[i],node_list[i+2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4)
+                        edges.append((i,i+2*n_columns-1)), edges.append((i+2*n_columns-1,i))
+        #Promote vertical start of trajectory
+        if i == idx_start_node and (i)//n_columns != (n_rows -1):   #...and not in last row
+            graph.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2-v_prom)
+            edges.append((i,i+n_columns)), edges.append((i+n_columns,i))
 
-idx_start_node = 1
-idx_goal_node = 99
+        #Promote horizontal end of trajectory
+        if i == idx_goal_node: 
+            if (i + 1)%n_columns != 0:           #...and not in last column
+                graph.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2-h_prom)
+                edges.append((i,i+1)), edges.append((i+1,i))
 
-for i in range(n_nodes):
-    node_i = Node("{0:b}".format(i)) #creates nodes with boolean string as varable name (etc. 0 ->'0', 4 -> '100')
-    node_list.append(node_i)
-     
-g = Graph(node_list)
-for i in range(n_nodes): #Initialize all edges to node neighbours given weights
-    #==First 8 edges== 
-    #Right(3)
-    if (i + 1)%n_columns != 0:              #not in last column
-        if (i+1,1*(weights[i]+ weights[i+1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist
-            g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2)
-        if (i)//n_columns != (n_rows -1):   #...and not in last row 
-            if (i+n_columns+1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i+n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns+1])/2)
-        if (i)//n_columns != 0:             #...and not in first row
-            if (i+n_columns+1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i-n_columns+1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns+1])/2)
-    #Left(3)
-    if (i + 1)%n_columns != 1: #not in first column
-        if (i-1,1*(weights[i]+ weights[i-1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist      
-                g.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2)
-        if (i)//n_columns != (n_rows -1):   #...and not in last row
-             if (i+n_columns-1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist 
-                g.connect(node_list[i],node_list[i+n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i+n_columns-1])/2)
-        if (i)//n_columns != 0:             #...and not in first row
-            if (i-n_columns-1,np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2) not in g.connections(node_list[i]): #This edge doesn't already exist 
-                g.connect(node_list[i],node_list[i-n_columns-1],np.round(np.sqrt(2),2)*(weights[i]+ weights[i-n_columns-1])/2)
-    
-    #Up(1)
-    if (i)//n_columns != 0: #not in first row
-        if (i-n_columns,1*(weights[i]+ weights[i-n_columns])/2) not in g.connections(node_list[i]): #This edge doesn't already exist                       
-            g.connect(node_list[i],node_list[i-n_columns],1*(weights[i]+ weights[i-n_columns])/2)
-    #Down(1)
-    if (i)//n_columns != (n_rows -1):       #not in last row
-        if (i+n_columns,1*(weights[i]+ weights[i+n_columns])/2) not in g.connections(node_list[i]):    #This edge doesn't already exist
-            g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2)
-    
-    #==Extend to 16 edges==
-    #Left(2)
-    if (i)%n_columns > 1:               #not in two first columns
-        if (i)//n_columns != (n_rows -1):   #...and not in last row
-            if (i+n_columns-2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4) not in g.connections(node_list[i]): #This edge doesn't already exist 
-                g.connect(node_list[i],node_list[i+n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns-2] + weights[i+n_columns-1] + weights[i-1])/4)
-        if (i)//n_columns != 0:             #...and not in first row
-            if (i-n_columns-2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i-n_columns-2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns-2] + weights[i-n_columns-1] + weights[i-1])/4)
-    #Right(2)   
-    if (i)%n_columns < (n_columns - 2): #not in two last columns
-        if (i)//n_columns != (n_rows -1):   #...and not in last row
-            if (i+n_columns+2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i+n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns+2] + weights[i+n_columns-+1] + weights[i+1])/4)
-        if (i)//n_columns != 0:             #...and not in first row
-            if (i-n_columns+2,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i-n_columns+2],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns+2] + weights[i-n_columns+1] + weights[i+1])/4)
-    #Up(2)
-    if (i)//n_columns > 1:              #not in first two rows
-        if (i + 1)%n_columns != 0:           #...and not in last column
-            if (i-2*n_columns+1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i-2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+1] + weights[i-2*n_columns+1])/4)
+            if (i + 1)%n_columns != 1:           #...and not in first column
+                graph.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2-h_prom)
+                edges.append((i,i-1)), edges.append((i-1,i))
+    return graph, edges
 
-        if (i + 1)%n_columns != 1:           #...and not in first column
-            if (i-2*n_columns-1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i-2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i-n_columns] + weights[i-n_columns+-1] + weights[i-2*n_columns-1])/4)
 
-    #Down(2)
-    if (i)//n_columns < (n_rows -2):    #not in last two rows
-        if (i + 1)%n_columns != 0:           #...and not in last column
-            if (i+2*n_columns+1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i+2*n_columns+1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+1] + weights[i+2*n_columns+1])/4)
-
-        if (i + 1)%n_columns != 1:           #...and not in first column
-            if (i+2*n_columns-1,np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4) not in g.connections(node_list[i]):    #This edge doesn't already exist
-                g.connect(node_list[i],node_list[i+2*n_columns-1],np.round(np.sqrt(5),2)*(weights[i]+ weights[i+n_columns] + weights[i+n_columns+-1] + weights[i+2*n_columns-1])/4)
-
-    #Promote vertical start of trajectory
-    if i == idx_start_node and (i)//n_columns != (n_rows -1):   #...and not in last row
-        g.connect(node_list[i],node_list[i+n_columns],1*(weights[i]+ weights[i+n_columns])/2-vert_start_prom)
-    
-    #Promote horizontal end of trajectory
-    if i == idx_goal_node: 
-        if (i + 1)%n_columns != 0:           #...and not in last column
-            g.connect(node_list[i],node_list[i+1],1*(weights[i]+ weights[i+1])/2-horiz_end_prom)
-
-        if (i + 1)%n_columns != 1:           #...and not in first column
-            g.connect(node_list[i],node_list[i-1],1*(weights[i]+ weights[i-1])/2-horiz_end_prom)
-
-     
 def str_to_coord(idx_str, n_columns, n_rows):
     idx_dec = (int(idx_str, 2))
     y = idx_dec//n_columns
     x = idx_dec - y*n_columns
     return x,y
+
 
 def idx_to_coord(idx,n_columns, n_rows):
     y = idx//n_columns
@@ -333,9 +334,9 @@ def idx_to_coord(idx,n_columns, n_rows):
     return x,y
 
 
-#=============TESTING EDGE GRAPH===============#
 def tuple_string(tup):
     return "{0:b}".format(tup[0])+"-"+"{0:b}".format(tup[1])
+
 
 def nodes_to_angle(pair_a, pair_b,n_columns, n_rows):
     a = np.array(idx_to_coord(pair_a[0],n_columns,n_rows))
@@ -347,78 +348,60 @@ def nodes_to_angle(pair_a, pair_b,n_columns, n_rows):
     bc = c - b
     return np.arccos(np.dot(ab,bc)/(np.linalg.norm(ab)*np.linalg.norm(bc))) 
 
-node_pair_tuples = []                              
-for i in range(n_nodes):                           #Find all edges in previous graph
-    for connection in g.connections(node_list[i]): #Look through all edges from each node
-        node_pair = (i,connection[0])
-        if node_pair not in node_pair_tuples:
-            node_pair_tuples.append(node_pair)
 
+def init_pair_nodes(graph, node_list, n_nodes, edges):
+    n_pair_nodes = len(edges)
+    node_pair_list = []                                #List of nodes for pair-graph
+    node_pair_dir = {}                                 #Directory to keep track of the corresponding node-pair indices and previous weight for each node-pair-tuple
+    for i in range(n_pair_nodes):                      #Create nodes corresponding to each previous edge
+        edge_w = np.inf   
+        for connection in graph.connections(node_list[edges[i][0]]):
+            if (connection[0] == edges[i][1]) and (connection[1]<edge_w):
+                edge_w = connection[1]
 
-n_pair_nodes = len(node_pair_tuples)
-
-node_pair_list = []                                #List of nodes for pair-graph
-node_pair_dir = {}                                 #Directory to keep track of the corresponding node-pair indices and previous weight for each node-pair-tuple
-for i in range(n_pair_nodes):                      #Create nodes corresponding to each previous edge
-    edge_w = np.inf   
-    for connection in g.connections(node_list[node_pair_tuples[i][0]]):
-        if (connection[0] == node_pair_tuples[i][1]) and (connection[1]<edge_w):
-            edge_w = connection[1]
-
-            
-    node_pair_dir[tuple_string(node_pair_tuples[i])] = (i,edge_w)
-    node_pair_i = Node(tuple_string(node_pair_tuples[i])) #creates nodes from previous edges with boolean string as varable name (etc. 2-4 -> '10-100')
-    node_pair_list.append(node_pair_i)
-
-node_pair_list.append(Node("start_node"))
-node_pair_list.append(Node("target_node"))
-print(len(node_pair))
-
-g_pairs = Graph(node_pair_list)
-
-for i in range(n_pair_nodes):    #Initialize all edges to node-pair neighbours given previous individual weights and angle between node-pair-lines
-    node = node_pair_tuples[i][1]   #Connecting node                      
-    if idx_start_node == node_pair_tuples[i][0]:
-        g_pairs.connect(node_pair_list[i],node_pair_list[-2],1)
-    if idx_goal_node == node_pair_tuples[i][1]:
-        g_pairs.connect(node_pair_list[i],node_pair_list[-1],1)
+        node_pair_dir[tuple_string(edges[i])] = (i,edge_w)
+        node_pair_i = Node(tuple_string(edges[i])) #creates nodes from previous edges with boolean string as varable name (etc. 2-4 -> '10-100')
+        node_pair_list.append(node_pair_i)
     
-    for connection in g.connections(node):
-        if connection[0] in node_pair_tuples[i]:
-            continue
-        edge_weight = node_pair_dir[tuple_string(node_pair_tuples[i])][1] + node_pair_dir[tuple_string((node,connection[0]))][1] + curvature_penalty*nodes_to_angle(node_pair_tuples[i], (node,connection[0]), n_columns,n_rows)**2
-
-        if (node_pair_dir[tuple_string((node,connection[0]))][0], edge_weight) not in g_pairs.connections(node_pair_list[i]):         #This edge doesn't already exist      
-            g_pairs.connect_dir(node_pair_list[i], node_pair_list[node_pair_dir[tuple_string((node,connection[0]))][0]], edge_weight)
+    node_pair_list.append(Node("start_node"))
+    node_pair_list.append(Node("target_node"))
+    g_pairs = Graph(node_pair_list)
+ 
+    return g_pairs, node_pair_list, node_pair_dir
 
 
+def init_pair_edges(g_pairs, graph, node_pair_list, node_pair_dir, edges, idx_start_node, idx_goal_node, curv_pen, n_col, n_rows):
+    for i in range(len(edges)):    #Initialize all edges to node-pair neighbours given previous individual weights and angle between node-pair-lines
+        node = edges[i][1]   #Connecting node                      
+        if idx_start_node == edges[i][0]:
+            g_pairs.connect(node_pair_list[i],node_pair_list[-2],1)
+        if idx_goal_node == edges[i][1]:
+            g_pairs.connect(node_pair_list[i],node_pair_list[-1],1)
+        
+        for connection in graph.connections(node):
+            if connection[0] in edges[i]:
+                continue
+            edge_weight = node_pair_dir[tuple_string(edges[i])][1] + node_pair_dir[tuple_string((node,connection[0]))][1] + curv_pen*nodes_to_angle(edges[i], (node,connection[0]), n_col,n_rows)**2
+            if (node_pair_dir[tuple_string((node,connection[0]))][0], edge_weight) not in g_pairs.connections(node_pair_list[i]):         #This edge doesn't already exist
+                g_pairs.connect_dir(node_pair_list[i], node_pair_list[node_pair_dir[tuple_string((node,connection[0]))][0]], edge_weight)
 
-    
-    
-###############
-#Calculate shortest path
+    return g_pairs
 
 
-source = node_pair_list[-2]
-paths = [(weight, [n.data for n in node]) for (weight, node) in g_pairs.dijkstra(source)] #All paths from start node
-for i in range(n_pair_nodes): #Find the path from start node to goal node 
-    if (paths[i][1][-1] == "target_node"):
-        traj_str = paths[i][1]
-        traj_cost = paths[i][0]
-print("Shortest path trajectory:", traj_str)
-print("Cost of trajectory: ", traj_cost)
-
-
-#Illustration 
-
-import matplotlib
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-colors = 'lime red cyan magenta yellow blue'.split()
-cmap = matplotlib.colors.ListedColormap(colors, name='colors', N=None)
+def dijkstraSPA(graph_pairs, node_pair_list): #Calculate shortest path
+    source = node_pair_list[-2]
+    paths = [(weight, [n.data for n in node]) for (weight, node) in graph_pairs.dijkstra(source)] #All paths from start node
+    for i in range(len(node_pair_list)): #Find the path from start node to goal node 
+        if (paths[i][1][-1] == "target_node"):
+            traj_str = paths[i][1]
+            traj_cost = paths[i][0]
+            return traj_str, traj_cost
+    print("Error: Unable to find sjortest path")
+    return
 
 def illustrate(weights,traj_str,n_columns,n_rows):
+    colors = 'lime red cyan magenta yellow blue'.split()
+    cmap = matplotlib.colors.ListedColormap(colors, name='colors', N=None)
     w_m = np.reshape(weights,(n_rows,n_columns))
     ax = plt.subplot(111)
     im = plt.imshow(w_m, cmap=cmap)
@@ -434,4 +417,42 @@ def illustrate(weights,traj_str,n_columns,n_rows):
     plt.show()
     return
 
-illustrate(weights,traj_str,n_columns,n_rows)
+def run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_prom, h_prom, curv_pen , bool_16):
+    start = timeit.default_timer()
+
+    n_nodes = n_rows*n_col
+    graph, nodes = init_nodes(n_nodes)
+    graph, edges = init_edges(graph, nodes, weights, n_col, n_rows, v_prom, h_prom, bool_16,idx_start,idx_target)
+    graph_pairs, node_pair_list, node_pair_dir = init_pair_nodes(graph, nodes, n_nodes, edges)
+    graph_pairs = init_pair_edges(graph_pairs, graph, node_pair_list, node_pair_dir, edges ,idx_start,idx_target,curv_pen, n_col, n_rows)
+    traj, cost = dijkstraSPA(graph_pairs, node_pair_list)
+
+    stop = timeit.default_timer()
+    print("Time: ", stop-start) 
+
+    illustrate(weights,traj,n_col,n_rows)
+    return traj, cost
+
+
+#=======SET PARAMETERS==========# 
+
+n_rows = 13
+n_col = 10
+idx_start = 1
+idx_target = 99
+
+weights = np.ones(n_rows*n_col)
+weights[20:40] = 2
+weights[40:50] = 3
+weights[50:70] = 4
+weights[73:80] = 5
+weights[84]    = 5
+weights[96]    = 5
+weights[100:130] = 6
+
+v_start_prom = 2
+h_end_prom = 2
+curv_pen = 3
+bool_16 = True # Connectivity of 16 (connectivity of 8 if false)
+
+traj, cost = run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_start_prom, h_end_prom, curv_pen , bool_16)

@@ -1,3 +1,5 @@
 numpy
 matplotlib
 tornado
+stable-baselines
+tensorflow==1.15

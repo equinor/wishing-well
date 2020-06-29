@@ -85,6 +85,7 @@ class WellPlot3Env(gym.Env):
     def step(self, action):
         action = self.scale_point(self.actions_dict[action])
         self.state = np.array([self.state[0]+action[0], self.state[1]+action[1]])
+        self.state = np.clip(self.state,0,(self.grid_height-1)*self.distance_points)  #Makes the state stay inside the boundary
         done = np.array_equal(self.state,self.end_state)
         reward = self.get_reward(self.state)
         return self.state, reward, done, {}
@@ -117,6 +118,8 @@ class WellPlot3Env(gym.Env):
     #Allows you to get reward for specified state
     def get_reward(self,state):
         state = tuple(state)
+        if self.valid_state(state)==0:
+            return -1
         if state in self.reward_dict:
             return self.reward_dict[state]
         else:
@@ -141,3 +144,13 @@ class WellPlot3Env(gym.Env):
     
     def plot_point(self,point):
         self.subplot.plot(point[0], point[1], "or")
+
+""" env = WellPlot3Env()
+print(env.observation_space)
+print(env.action_space) 
+for i in range(20):
+    random_action = env.action_space.sample()
+    new_state, reward,done,info = env.step(random_action)
+    print(env.action_space.sample())
+    print(env.plt.show())
+ """

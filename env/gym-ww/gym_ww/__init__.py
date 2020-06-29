@@ -11,3 +11,13 @@ register(
     entry_point='gym_ww.envs:WellPlot5Env',
 )
 
+register(
+    id='well-plot-16-v0',
+    entry_point='gym_ww.envs:WellPlot16Env',
+)
+
+register(
+    id='well-plot-16-v1',
+    entry_point='gym_ww.envs:WellPlot16EnvAdvanced',
+)
+

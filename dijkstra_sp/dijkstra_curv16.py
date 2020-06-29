@@ -422,15 +422,14 @@ def illustrate(weights,traj_str,n_columns,n_rows):
     return
 
 def run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_prom, h_prom, curv_pen , max_angle, bool_16):
+    
     start = timeit.default_timer()
-
     n_nodes = n_rows*n_col
     graph, nodes = init_nodes(n_nodes)
     graph, edges = init_edges(graph, nodes, weights, n_col, n_rows, v_prom, h_prom, bool_16,idx_start,idx_target)
     graph_pairs, node_pair_list, node_pair_dir = init_pair_nodes(graph, nodes, n_nodes, edges)
     graph_pairs = init_pair_edges(graph_pairs, graph, node_pair_list, node_pair_dir, edges , idx_start, idx_target, curv_pen, max_angle ,n_col, n_rows)
     traj, cost = dijkstraSPA(graph_pairs, node_pair_list)
-
     stop = timeit.default_timer()
     print("Time: ", stop-start) 
     print("Trajectory found: ", traj)
@@ -455,10 +454,10 @@ weights[84]    = 5
 weights[96]    = 5
 weights[100:130] = 6
 
-v_start_prom = 2
-h_end_prom = 2
-curv_pen = 3
-max_angle = 50*np.pi/180
+v_start_prom = 100
+h_end_prom = 100
+curv_pen = 50
+max_angle = 50*np.pi/180 #360/16 current smallest angle 
 bool_16 = True # Connectivity of 16 (connectivity of 8 if false)
 
 traj, cost = run_DSPA(n_rows, n_col, idx_start, idx_target, weights, v_start_prom, h_end_prom, curv_pen, max_angle, bool_16)

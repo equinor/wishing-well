@@ -2,33 +2,79 @@
 Team repo for Wishing Well team - Virtual summer internship 2020
 
 
-## Showing plot in browser
+This is a C++ library for computing shortest paths with higher-order properties like curvature and torsion taken into account. It implements the algorithms of our ICCV 2013 paper [1] and PAMI 2015 paper [2].
 
-First, navigate to the wishing-well repository on your computer.
-Then build the container using:
+[![Build Status](https://travis-ci.org/PetterS/curve_extraction.png)](https://travis-ci.org/PetterS/curve_extraction)
 
-```docker build -t wishing-well-app .```
+Compilation
+====
+The following is required to compile the library:
+* C++ compiler.
+* CMake
+* Spii installed; see https://github.com/PetterS/spii 
 
-Then run it with:
+All tests pass with the following compilers:
+* Visual Studio 2013
+* GCC 4.8 (Cygwin)
+* GCC 4.7 (Ubuntu)
 
-```docker run -it --mount "type=bind,source="$(pwd)",target=/app"-p 8080:8080 --name wwrunning wishing-well-app```
+Earlier compilers might not work.
 
-It should now display the plot at http://localhost:8080/
+### Linux ###
 
-When you have changed your code, you need to run
 
-```docker rm -f wwrunning```
+* Spii
+```
+git clone https://github.com/PetterS/spii
+cd spii
+mkdir build
+cd build
+cmake ..
+make && make test
+sudo make install
+```
 
-Then just run again.
+* Curve_extraction
+```
+git clone https://github.com/PetterS/curve_extraction
+cd curve_extraction
+mkdir build
+cd build
+cmake ..
+make && make test
+sudo make install
+```
 
-Or, if you want to do it like the pros, just copy-paste this into your terminal (Powershell) It will remove the old container, run it again and show the plot:
+Matlab
+------
 
-```docker rm -f wwrunning; docker run -dit --mount type=bind,source="$(pwd)",target=/app -p 8080:8080 --name wwrunning wishing-well-app; Start-Sleep -s 2; Start "http://localhost:8080/"; docker logs -f wwrunning```
+Paths can be changed in compile.m.
 
-(The Start-Sleep is there to give the server time to start. docker logs shows output)
+### Linux ###
+1. Install curve_extraction and spii using instruction above.
+2. Install Eigen3 in /usr/local/include/eigen3.
 
-For debugging, this is better. It prints output from the program as it goes (not when its finished):
+You can now run /matlab/examples/simple_3D.m all files compiles on demand.
 
-```docker rm -f wwrunning; docker run -it --mount type=bind,source="$(pwd)",target=/app -p 8080:8080 --name wwrunning wishing-well-app ```
+### Windows ###
+1. Use CMake to build SPII and curve_extraction. (if building curve_extraction throws error for sqrt, add the following line  in the header curve_extraction/source/mesh.cpp and curve_extraction/source/grid_mesh.cpp "#include <cmath>" )
+2. Copy spii\include to C:\Program Files\SPII\include
+3. Copy \<spii-build-path\>\bin\spii.dll to C:\Program Files\SPII\lib
+4. Copy \<spii-build-path\>\lib\Release\\* to C:\Program Files\SPII\lib
+5. Copy curve_extraction\include\ to  C:\Program Files\curve_extraction\include
+6. Copy \<curve_extraction-build-path\>\lib\ to C:\Program Files\curve_extraction\lib
+7. Download and put all [Eigen 3](http://eigen.tuxfamily.org/) headers in C:\Program Files\Eigen
+8. If your version of MATLAB does not support Visual Studio 2013 follow the instructions [http://www.mathworks.com/matlabcentral/fileexchange/44408-matlab-mex-support-for-visual-studio-2013-and-mbuild](http://www.mathworks.com/matlabcentral/fileexchange/44408-matlab-mex-support-for-visual-studio-2013-and-mbuild).
+9. Add C:\Program Files\SPII\lib to your system path.
 
-Note that if you edit for example the env, you have to build the container again for the changes to take effect. If you are not seeing your changes being applied, try rebuilding.
+You can now run /matlab/examples/simple_3D.m all files compiles on demand.
+
+Video
+====
+ * http://www.youtube.com/watch?v=9qjQj3I5pBc
+
+References
+====
+1. Petter Strandmark, Johannes Ulén, Fredrik Kahl, Leo Grady. [Shortest Paths with Curvature and Torsion](http://www2.maths.lth.se/vision/publications/publications/view_paper.php?paper_id=582). International Conference on Computer Vision. 2013.
+
+2. Johannes Ulén, Petter Strandmark, Fredrik Kahl [Shortest Paths with Higher-Order Regularization](http://www2.maths.lth.se/vision/publications/publications/view_paper.php?paper_id=623). IEEE Transactions on Pattern Analysis and Machine Intelligence. 2015

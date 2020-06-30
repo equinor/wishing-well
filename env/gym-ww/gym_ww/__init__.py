@@ -17,7 +17,7 @@ register(
 )
 
 register(
-    id='well-plot-16-v1',
-    entry_point='gym_ww.envs:WellPlot16EnvAdvanced',
+    id='well-plot-21-v0',
+    entry_point='gym_ww.envs:WellPlot21Env',
 )
 

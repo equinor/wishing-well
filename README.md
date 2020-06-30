@@ -57,7 +57,7 @@ Paths can be changed in compile.m.
 You can now run /matlab/examples/simple_3D.m all files compiles on demand.
 
 ### Windows ###
-1. Use CMake to build SPII and curve_extraction. (if building curve_extraction throws error for sqrt, add the following line  in the header curve_extraction/source/mesh.cpp and curve_extraction/source/grid_mesh.cpp "#include <cmath>" )
+1. Use CMake to build SPII and curve_extraction. (if building curve_extraction throws error for sqrt, add the following line  in the header curve_extraction/source/mesh.cpp and curve_extraction/source/grid_mesh.cpp "#include \<cmath\>")
 2. Copy spii\include to C:\Program Files\SPII\include
 3. Copy \<spii-build-path\>\bin\spii.dll to C:\Program Files\SPII\lib
 4. Copy \<spii-build-path\>\lib\Release\\* to C:\Program Files\SPII\lib

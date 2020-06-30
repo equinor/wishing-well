@@ -1,18 +1,15 @@
 
 from plothandler import *                           #Import the server that plots the result in browser
-from env.shortest_path_random_walk import *         #Import everything from shortest_path_random_walk
+from shortest_path_random_walk.shortest_path_random_walk_new import *         #Import everything from shortest_path_random_walk
 
 def main():
-    model = shortest_path(7, 30, [1, 0], [5, 6])        #Run the shortest_path program
+    agent = shortest_path()        #Run the shortest_path program
     
-    model.grid_gen()
-    model.optimal_path(100)   
-    model.grid_gen()
-
-    print("heisann")
+    agent.optimal_path()   
+    #model.grid_gen()
 
     #This part starts the plotting server:
-    figure = model.get_figure()
+    figure = agent.get_figure()
     application = MyApplication(figure)
 
     http_server = tornado.httpserver.HTTPServer(application)

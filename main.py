@@ -1,33 +1,32 @@
-
 from plothandler import *                           #Import the server that plots the result in browser
 from shortest_path_random_walk.shortest_path_random_walk_new import *         #Import everything from shortest_path_random_walk
 from stable_baselines import DQN, PPO2
 from stable_baselines.common.cmd_util import make_vec_env
 from stable_baselines.deepq.policies import MlpPolicy
 import numpy as np
+import sys
 
 def main():
-<<<<<<< HEAD
-    env = gym.make('well-plot-5-v0')
+    env = gym.make('well-plot-16-v0')
     env.set_reward(env.scale_point([5,6]),1)
     env.set_init_end_state([1,0],[5,6])
     print("init state: ", env.init_state)
     print("end state: ", env.end_state)
-    
-    #model = PPO2('MlpPolicy', env, verbose=1)
-    #model.learn(total_timesteps =25000)
-    #model.save("ppo2_shortpath")
-    
-    #test loading
-    #del model
-    model = PPO2.load("ppo2_shortpath")
-    print("done and saved")
-    
+
+    if len(sys.argv)>1:
+        #To train model run script with an argument (doesn't matter what)
+        model = PPO2('MlpPolicy', env, verbose=1)
+        model.learn(total_timesteps =25000)
+        model.save("ppo2_shortpath")
+    else:
+        #Else it will load a saved one
+        model = PPO2.load("ppo2_shortpath")
+   
     #For plotting
-    policies_x = []
-    policies_y = []
-    policies_x.append(env.init_state[0])
-    policies_y.append(env.init_state[1])
+    path_x = []
+    path_y = []
+    path_x.append(env.init_state[0])
+    path_y.append(env.init_state[1])
 
     #Test trained agent
     obs = env.reset()
@@ -44,45 +43,17 @@ def main():
             print("valid")
         if done:
             print("Goal is reached!" , "reward = ", reward)
-            policies_x.append(obs[0])
-            policies_y.append(obs[1])
+            path_x.append(obs[0])
+            path_y.append(obs[1])
             break
-        policies_x.append(obs[0])
-        policies_y.append(obs[1])    
+        path_x.append(obs[0])
+        path_y.append(obs[1])    
         
-    policies = np.column_stack([policies_x,policies_y])
-    print("Policies shape: ",len(policies), "\n policies shape: ", policies.shape, "\n policies :", policies)
+    path = np.column_stack([path_x,path_y])
+    print("path shape: ",len(path), "\n path shape: ", path.shape, "\n path :\n", path)
     
-
     #This part starts the plotting server:  
-    figure =  env.render(policies_x,policies_y)
-=======
-    #agent = shortest_path()        #Run the shortest_path program
-    
-    #agent.optimal_path()   
-
-    env = gym.make('well-plot-21-v0')
-    #env.set_grid_size(100,50,200)
-    #env.set_init_end_state((10,0),(80,45))
-    #check_env(agent.env,warn=True)
-
-    env.reset()
-    state_list = [env.state]
-    #action = 1.0
-    #new_state, reward, done, info = env.step(action)
-    #state_list.append(new_state)
-    for _ in range(100):
-        action = -1.0
-        new_state, reward, done, info = env.step(action)
-        state_list.append(new_state)
-
-    env.plot_path(state_list)
-
-    figure = env.render()
-
-    #This part starts the plotting server:
-    #figure = agent.get_figure()
->>>>>>> 597f4b8cee338b43be1adfea9f4e1a979d4d38d7
+    figure =  env.render(path_x,path_y)
     application = MyApplication(figure)
 
     http_server = tornado.httpserver.HTTPServer(application)

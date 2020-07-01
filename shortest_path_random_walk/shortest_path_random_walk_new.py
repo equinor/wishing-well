@@ -48,7 +48,7 @@ class shortest_path:
         
 
     def optimal_path(self, policies):
-        """ policies = []
+        policies = []
         
         for i in range(self.num_tries):
             policy = self.game()
@@ -58,19 +58,12 @@ class shortest_path:
 
         policies = [ list(policy) for policy in policies ]
         policies.sort(key=len)
-<<<<<<< HEAD
-        shortest_policy = policies[0]
-        print("Length of shortest path found: ", len(shortest_policy)-1) """
-
-        self.env.plot_path(policies)
-=======
         if not len(policies) == 0:
             shortest_policy = policies[0]
             print("Length of shortest path found: ", len(shortest_policy)-1)
             self.env.plot_path(shortest_policy)
         else:
             print("No path of length ", self.max_len_path," or shorter found.")
->>>>>>> 597f4b8cee338b43be1adfea9f4e1a979d4d38d7
 
 
     #Check if action is in board. Can be replaced by negative rewards when using RL: env.set_reward(state,reward)

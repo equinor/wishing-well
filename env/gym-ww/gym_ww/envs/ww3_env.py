@@ -95,14 +95,14 @@ class WellPlot3Env(gym.Env):
         self.np_random, seed = seeding.np_random(seed) 
         return [seed]
 
-    def render(self, policies_x,policies_y):
+    def render(self, path_x,path_y):
 
         plt.xlim([0,(self.grid_width-1)*self.distance_points])
         plt.ylim([(self.grid_height-1)*self.distance_points,0])
 
         plt.xlabel('Depth') 
         plt.ylabel('Horizontal  ')
-        self.subplot.plot(policies_x,policies_y)
+        self.subplot.plot(path_x,path_y)
         self.subplot.grid()
         self.subplot.set_axisbelow(True)
         
@@ -112,12 +112,12 @@ class WellPlot3Env(gym.Env):
     def plot_line(self,point1,point2):
         plt.plot((point1[0], point2[0]), (point1[1], point2[1]))
 
-    def plot_path(self,policies):
-        if policies is None:
+    def plot_path(self,path):
+        if path is None:
             raise TypeError("Path was of type None")
 
-        for i in range(1,len(policies)):
-            self.plot_line(policies[:,0][i],policies[:,1][i])
+        for i in range(1,len(path)):
+            self.plot_line(path[:,0][i],path[:,1][i])
 
 
 

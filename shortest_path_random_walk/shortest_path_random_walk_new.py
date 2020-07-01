@@ -5,7 +5,7 @@ Created on Thu Jun 18 08:48:53 2020
 @author: Jakob Torben
 """
 
-import matplotlib as mpl            #Import entire matplotlib and use WebAgg for showing in browser
+import matplotlib as mpl            #Import entire matplotlib
 
 import matplotlib.pyplot as plt     #Still use plt for pyplot for familiarity
 import numpy as np
@@ -14,7 +14,6 @@ import gym
 
 #from gym import envs
 from gym_ww import envs
-from stable_baselines.common.env_checker import check_env
 
 #gym.make('well-plot-3-v0')
 
@@ -23,8 +22,8 @@ class shortest_path:
         self.env = gym.make('well-plot-5-v0')
         self.policy = []
 
-        self.num_tries = 5
-        self.max_len_path = 15
+        self.num_tries = 15
+        self.max_len_path = 10
     
     def game(self):
         self.policy = [self.env.state]
@@ -59,10 +58,19 @@ class shortest_path:
 
         policies = [ list(policy) for policy in policies ]
         policies.sort(key=len)
+<<<<<<< HEAD
         shortest_policy = policies[0]
         print("Length of shortest path found: ", len(shortest_policy)-1) """
 
         self.env.plot_path(policies)
+=======
+        if not len(policies) == 0:
+            shortest_policy = policies[0]
+            print("Length of shortest path found: ", len(shortest_policy)-1)
+            self.env.plot_path(shortest_policy)
+        else:
+            print("No path of length ", self.max_len_path," or shorter found.")
+>>>>>>> 597f4b8cee338b43be1adfea9f4e1a979d4d38d7
 
 
     #Check if action is in board. Can be replaced by negative rewards when using RL: env.set_reward(state,reward)

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 #gym.logger.set_level(40)
 
 class WellPlot3Env(gym.Env):
-    metadata = {'render.modes': ['human']}
+    metadata = {'render.modes': ['console']}
 
     def __init__(self):
         super(WellPlot3Env, self).__init__()
@@ -55,9 +55,10 @@ class WellPlot3Env(gym.Env):
         self.update_plot()
 
     #Method for setting grid-size other than default
-    def set_grid_size(self,width,height):
+    def set_grid_size(self,width,height,distance_points=20):
         self.grid_width = width
         self.grid_height = height
+        self.distance_points = distance_points
         self.update_obv_space()
         self.update_plot()
 
@@ -68,7 +69,7 @@ class WellPlot3Env(gym.Env):
         y = np.arange(0, self.grid_height*self.distance_points, self.distance_points)
         X, Y = np.meshgrid(x, y)
         
-        self.subplot.plot(X, Y, 'ob')
+        self.subplot.plot(X, Y, 'ob',markersize=2)
         self.fig.gca().invert_yaxis()
 
         self.subplot.plot(self.init_state[0], self.init_state[1], "or", label="start", markersize=10)

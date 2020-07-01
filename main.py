@@ -7,6 +7,7 @@ from stable_baselines.deepq.policies import MlpPolicy
 import numpy as np
 
 def main():
+<<<<<<< HEAD
     env = gym.make('well-plot-5-v0')
     env.set_reward(env.scale_point([5,6]),1)
     env.set_init_end_state([1,0],[5,6])
@@ -55,6 +56,33 @@ def main():
 
     #This part starts the plotting server:  
     figure =  env.render(policies_x,policies_y)
+=======
+    #agent = shortest_path()        #Run the shortest_path program
+    
+    #agent.optimal_path()   
+
+    env = gym.make('well-plot-21-v0')
+    #env.set_grid_size(100,50,200)
+    #env.set_init_end_state((10,0),(80,45))
+    #check_env(agent.env,warn=True)
+
+    env.reset()
+    state_list = [env.state]
+    #action = 1.0
+    #new_state, reward, done, info = env.step(action)
+    #state_list.append(new_state)
+    for _ in range(100):
+        action = -1.0
+        new_state, reward, done, info = env.step(action)
+        state_list.append(new_state)
+
+    env.plot_path(state_list)
+
+    figure = env.render()
+
+    #This part starts the plotting server:
+    #figure = agent.get_figure()
+>>>>>>> 597f4b8cee338b43be1adfea9f4e1a979d4d38d7
     application = MyApplication(figure)
 
     http_server = tornado.httpserver.HTTPServer(application)

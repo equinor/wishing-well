@@ -8,7 +8,7 @@ Created on Thu Jun 18 08:48:53 2020
 import matplotlib as mpl            #Import entire matplotlib
 
 import matplotlib.pyplot as plt     #Still use plt for pyplot for familiarity
-import numpy as np
+import numpy as np  
 import random
 import gym
 
@@ -47,7 +47,7 @@ class shortest_path:
         return None
         
 
-    def optimal_path(self):
+    def optimal_path(self, policies):
         policies = []
         
         for i in range(self.num_tries):

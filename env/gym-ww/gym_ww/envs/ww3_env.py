@@ -86,16 +86,46 @@ class WellPlot3Env(gym.Env):
     def step(self, action):
         action = self.scale_point(self.actions_dict[action])
         self.state = np.array([self.state[0]+action[0], self.state[1]+action[1]])
+        self.state = np.clip(self.state,0,(self.grid_height-1)*self.distance_points)  #Makes the state stay inside the boundary
         done = np.array_equal(self.state,self.end_state)
         reward = self.get_reward(self.state)
         return self.state, reward, done, {}
 
     def seed(self, seed=None):                                  #Seed method for generating something random? Not relevant for our problem
-        self.np_random, seed = seeding.np_random(seed)
+        self.np_random, seed = seeding.np_random(seed) 
         return [seed]
 
-    #def render(self, mode='human'):
-        #Not relevant for this problem scince we cant iteratively render the plot
+    def render(self, path_x,path_y):
+
+        plt.xlim([0,(self.grid_width-1)*self.distance_points])
+        plt.ylim([(self.grid_height-1)*self.distance_points,0])
+
+        plt.xlabel('Depth') 
+        plt.ylabel('Horizontal  ')
+        self.subplot.plot(path_x,path_y)
+        self.subplot.grid()
+        self.subplot.set_axisbelow(True)
+        
+        return self.fig
+
+
+    def plot_line(self,point1,point2):
+        plt.plot((point1[0], point2[0]), (point1[1], point2[1]))
+
+    def plot_path(self,path):
+        if path is None:
+            raise TypeError("Path was of type None")
+
+        for i in range(1,len(path)):
+            self.plot_line(path[:,0][i],path[:,1][i])
+
+
+
+
+
+        #Plot region to avoid
+#        circle = plt.Circle((self.c_y,-self.c_x),self.c_r,color='C2')
+#        ax.add_artist(circle)
 
     def reset(self):
         self.state = self.init_state
@@ -118,6 +148,8 @@ class WellPlot3Env(gym.Env):
     #Allows you to get reward for specified state
     def get_reward(self,state):
         state = tuple(state)
+        if self.valid_state(state)==0:
+            return -1
         if state in self.reward_dict:
             return self.reward_dict[state]
         else:

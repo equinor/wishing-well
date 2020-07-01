@@ -1,11 +1,6 @@
 from plothandler import *                           #Import the server that plots the result in browser
 from shortest_path_random_walk.shortest_path_random_walk_new import *         #Import everything from shortest_path_random_walk
 from ppo2_shortpath.ppo2_shortpath import *
-from stable_baselines import DQN, PPO2
-from stable_baselines.common.cmd_util import make_vec_env
-from stable_baselines.deepq.policies import MlpPolicy
-import numpy as np
-import sys
 
 def main():
     

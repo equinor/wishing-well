@@ -5,9 +5,7 @@
     #Install requirements
     COPY requirements.txt ./
     RUN pip install --no-cache-dir -r requirements.txt
-
-    #Installed trained model
-    COPY ppo2_shortpath.zip ./
+   
     #Install our custom openai gym
     COPY env ./
     RUN pip install --no-cache-dir -e ./gym-ww

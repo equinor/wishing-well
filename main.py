@@ -7,15 +7,12 @@ from stable_baselines.deepq.policies import MlpPolicy
 import numpy as np
 
 def main():
-    agent = shortest_path()        #Run the shortest_path program
-    
     env = gym.make('well-plot-5-v0')
-    env.set_reward(env.scale_point([3,6]),1)
-    env.set_init_end_state([1,0],[3,6])
+    env.set_reward(env.scale_point([5,6]),1)
+    env.set_init_end_state([1,0],[5,6])
     print("init state: ", env.init_state)
     print("end state: ", env.end_state)
-    print("obs space: ", env.observation_space)
-    print("shape: ", env.observation_space.shape)
+    
     #model = PPO2('MlpPolicy', env, verbose=1)
     #model.learn(total_timesteps =25000)
     #model.save("ppo2_shortpath")
@@ -25,8 +22,13 @@ def main():
     model = PPO2.load("ppo2_shortpath")
     print("done and saved")
     
+    #For plotting
+    policies_x = []
+    policies_y = []
+    policies_x.append(env.init_state[0])
+    policies_y.append(env.init_state[1])
+
     #Test trained agent
-    policies = []
     obs = env.reset()
     n_steps = 100
     for step in range(n_steps):
@@ -35,26 +37,24 @@ def main():
         print("Action: ", action)
         obs, reward, done, info = env.step(action)
         print('obs=',obs,'reward=',reward,'done=',done)
-
-        #obs = np.clip(obs, 0, (env.grid_width-1)*env.distance_points)
-        print("width*dist", env.grid_width*env.distance_points)
-        print("obs: ", obs)
         if not env.valid_state(obs):
             print("not valid")
         else:
             print("valid")
         if done:
-            print("Goal reached!" , "reward = ", reward)
+            print("Goal is reached!" , "reward = ", reward)
+            policies_x.append(obs[0])
+            policies_y.append(obs[1])
             break
-        policies.append(obs)
-        #print("Policies: ", policies)
-    print("Policies shape: ",len(policies), "/n policies: ", policies)
-    env.plot_path(policies)
-    agent.optimal_path(policies)   
-    #model.grid_gen()
+        policies_x.append(obs[0])
+        policies_y.append(obs[1])    
+        
+    policies = np.column_stack([policies_x,policies_y])
+    print("Policies shape: ",len(policies), "\n policies shape: ", policies.shape, "\n policies :", policies)
+    
 
     #This part starts the plotting server:  
-    figure = agent.get_figure()
+    figure =  env.render(policies_x,policies_y)
     application = MyApplication(figure)
 
     http_server = tornado.httpserver.HTTPServer(application)

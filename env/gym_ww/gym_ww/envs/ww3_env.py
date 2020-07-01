@@ -91,11 +91,40 @@ class WellPlot3Env(gym.Env):
         return self.state, reward, done, {}
 
     def seed(self, seed=None):                                  #Seed method for generating something random? Not relevant for our problem
-        self.np_random, seed = seeding.np_random(seed)
+        self.np_random, seed = seeding.np_random(seed) 
         return [seed]
 
-    #def render(self, mode='human'):
-        #Not relevant for this problem scince we cant iteratively render the plot
+    def render(self, policies_x,policies_y):
+
+        plt.xlim([0,(self.grid_width-1)*self.distance_points])
+        plt.ylim([(self.grid_height-1)*self.distance_points,0])
+
+        plt.xlabel('Depth') 
+        plt.ylabel('Horizontal  ')
+        self.subplot.plot(policies_x,policies_y)
+        self.subplot.grid()
+        self.subplot.set_axisbelow(True)
+        
+        return self.fig
+
+
+    def plot_line(self,point1,point2):
+        plt.plot((point1[0], point2[0]), (point1[1], point2[1]))
+
+    def plot_path(self,policies):
+        if policies is None:
+            raise TypeError("Path was of type None")
+
+        for i in range(1,len(policies)):
+            self.plot_line(policies[:,0][i],policies[:,1][i])
+
+
+
+
+
+        #Plot region to avoid
+#        circle = plt.Circle((self.c_y,-self.c_x),self.c_r,color='C2')
+#        ax.add_artist(circle)
 
     def reset(self):
         self.state = self.init_state
@@ -144,13 +173,3 @@ class WellPlot3Env(gym.Env):
     
     def plot_point(self,point):
         self.subplot.plot(point[0], point[1], "or")
-
-""" env = WellPlot3Env()
-print(env.observation_space)
-print(env.action_space) 
-for i in range(20):
-    random_action = env.action_space.sample()
-    new_state, reward,done,info = env.step(random_action)
-    print(env.action_space.sample())
-    print(env.plt.show())
- """

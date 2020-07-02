@@ -100,8 +100,8 @@ class WellPlot3Env(gym.Env):
         plt.xlim([0,(self.grid_width-1)*self.distance_points])
         plt.ylim([(self.grid_height-1)*self.distance_points,0])
 
-        plt.xlabel('Depth') 
-        plt.ylabel('Horizontal  ')
+        plt.xlabel('Horizontal') 
+        plt.ylabel('Depth')
         self.subplot.plot(path_x,path_y)
         self.subplot.grid()
         self.subplot.set_axisbelow(True)

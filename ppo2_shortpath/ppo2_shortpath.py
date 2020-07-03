@@ -18,13 +18,13 @@ class ppo2_shortpath:
     def get_model(self):
         if len(sys.argv)>1:
             #To train model run script with an argument (doesn't matter what)
-            model = PPO2('MlpPolicy', self.env, verbose=1)
+            model = PPO2('MlpPolicy', self.env, verbose=1, tensorboard_log="logs/")
             model.learn(total_timesteps =25000)
             model.save("ppo2_shortpath")
             return model
         else:
             #Else it will load a saved one
-            model = PPO2.load("ppo2_shortpath/ppo2_shortpath")
+            model = PPO2.load("ppo2_shortpath/ppo2_shortpath", tensorboard_log="logs/")
             return model
 
     def test_model(self,model):

@@ -21,11 +21,11 @@ class RRTStar(RRT):
             self.cost = 0.0
 
     def __init__(self, start, goal, obstacle_list, rand_area,
-                 expand_dis=50.0,
-                 path_resolution=10.0,
-                 goal_sample_rate=40,
-                 max_iter=2000,
-                 connect_circle_dist=50.0
+                 expand_dis=100.0,
+                 path_resolution=20.0,
+                 goal_sample_rate=20,
+                 max_iter=500,
+                 connect_circle_dist=90.0
                  ):
         super().__init__(start, goal, obstacle_list,
                          rand_area, expand_dis, path_resolution, goal_sample_rate, max_iter)

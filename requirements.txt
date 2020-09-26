@@ -2,4 +2,4 @@ numpy
 matplotlib
 tornado
 stable-baselines
-tensorflow==1.15.2
+tensorflow==1.15.4
